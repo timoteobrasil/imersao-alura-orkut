@@ -62,6 +62,33 @@ export default function Home() {
       .then(function (json) {
         setSeguidores(json)
       })
+
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': '82d2d9bd984fa665a72c05bce82ebb',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        "query": `query {
+          allCommunities {
+            id
+            title
+            imageUrl
+            creatorSlug
+          }
+          _allCommunitiesMeta {
+            count
+          }
+        }
+        `})
+    })
+    .then(response => response.json())
+    .then((respostaJson) => {
+      const comunidadesBackend = respostaJson.data.allCommunities
+      setComunidades(comunidadesBackend)
+    })
   }, [])
   return (
     <>
@@ -83,11 +110,27 @@ export default function Home() {
               e.preventDefault()
               const dadosDoForm = new FormData(e.target)
               const comunidade = {
-                id: new Date().toISOString(),
                 title: dadosDoForm.get('title'),
-                image: dadosDoForm.get('image'),
+                imageUrl: dadosDoForm.get('image'),
+                creatorSlug: pessoaAleatoria,
               }
-              setComunidades([...comunidades, comunidade])
+
+              fetch('/api/comunidades/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(comunidade),
+              })
+              .then(async(response) => {
+                const dados = await response.json()
+                console.log(dados.novaComunidade)
+                const comunidadeCriada = dados.novaComunidade
+                const comunidadesAtualizadas = [...comunidades, comunidadeCriada]
+                setComunidades(comunidadesAtualizadas)
+              }) 
+
+              //setComunidades([...comunidades, comunidade])
             }}>
               <div>
                 <input
@@ -120,8 +163,8 @@ export default function Home() {
               {comunidades.map((item) => {
                   return (
                     <li key={item.id}>
-                      <a href={`/users/${item.title}`}>
-                        <img src={item.image} />
+                      <a href={`/communities/${item.id}`}>
+                        <img src={item.imageUrl} />
                         <span>{item.title}</span>
                       </a>
                     </li>
