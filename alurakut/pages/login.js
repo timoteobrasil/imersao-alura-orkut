@@ -39,9 +39,10 @@ export default function LoginScreen() {
             className="box"
             onSubmit={(infosDoEvento) => {
               infosDoEvento.preventDefault();
-              const urlLogin = "https://alurakut.vercel.app/api/login"
-                //"https://imersao-alura-orkut.vercel.app/api/login";
-              // alert('Alguém clicou no botão!')
+              const urlLogin = //"http://localhost:3000/api/login"
+                //"https://alurakut.vercel.app/api/login"
+                "https://imersao-alura-orkut.vercel.app/api/login"
+
               console.log("Usuário: ", githubUser);
               fetch(urlLogin, {
                 method: "POST",
@@ -54,7 +55,7 @@ export default function LoginScreen() {
                 const token = dadosDaResposta.token;
                 nookies.set(null, "USER_TOKEN", token, {
                   path: "/",
-                  maxAge: 86400 * 7,
+                  maxAge: 86400,
                 });
                 router.push("/");
               });
